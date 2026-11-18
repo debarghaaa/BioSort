@@ -1,0 +1,316 @@
+openapi: 3.1.0
+info:
+  title: AI Medical Waste Segregation Inference & Policy API
+  version: 0.2.0
+  description: >
+    Separately deployable Python + FastAPI + ONNX Runtime service responsible for
+    image validation, preprocessing, ONNX classification, confidence verification,
+    policy-driven category-to-bin resolution, manual review integration, and Supabase persistence.
+    This service is an assistive classification and recordkeeping component only.
+paths:
+  /health:
+    get:
+      summary: Application liveness probe (independent of model readiness)
+      responses:
+        "200":
+          description: Application process is alive
+
+  /ready:
+    get:
+      summary: Readiness probe checking ONNX model loading, artefact alignment, JWT config, and Supabase connectivity
+      responses:
+        "200":
+          description: Service and ONNX classifier are ready
+        "503":
+          description: Required model artefacts or integrations are missing or failed validation
+
+  /api/v1/classifications:
+    post:
+      summary: Validate, preprocess, classify an uploaded medical waste image, evaluate policy, and persist event
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                jurisdiction_code:
+                  type: string
+      responses:
+        "200":
+          description: Canonical SharedClassificationResult
+          content:
+            application/json:
+              schema:
+                $ref: "./classification.schema.json"
+        "400":
+          description: Malformed, corrupted, or invalid dimensions image
+        "401":
+          description: Missing or invalid Supabase Bearer JWT
+        "413":
+          description: Image exceeds configured maximum byte limit
+        "415":
+          description: Unsupported MIME type or binary image encoding
+        "502":
+          description: Supabase Storage or PostgreSQL persistence failure
+        "503":
+          description: ONNX model artefacts not loaded
+    get:
+      summary: Paginated classification history with optional filters
+      parameters:
+        - name: decision_status
+          in: query
+          schema:
+            type: string
+            enum: [accepted, review_required, mapping_unconfigured, rejected]
+        - name: requires_manual_review
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated classification history
+
+  /api/v1/classifications/{classification_id}:
+    get:
+      summary: Retrieve a single classification event
+      parameters:
+        - name: classification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Classification record detail
+        "404":
+          description: Classification event not found
+
+  /api/v1/models/current:
+    get:
+      summary: Return currently loaded ONNX model metadata, preprocessing spec, and calibration config
+      responses:
+        "200":
+          description: Active loaded model metadata
+        "503":
+          description: ONNX model not loaded
+
+  /api/v1/bin-mappings:
+    get:
+      summary: Return configured regulatory category-to-bin mappings
+      parameters:
+        - name: jurisdiction_code
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Configured bin mappings
+
+  /api/v1/reviews:
+    get:
+      summary: Retrieve filtered and sorted manual-review queue (Reviewer or Admin role required)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, in_progress, confirmed, relabelled, unresolved]
+        - name: predicted_category
+          in: query
+          schema:
+            type: string
+        - name: model_version
+          in: query
+          schema:
+            type: string
+        - name: review_reason
+          in: query
+          schema:
+            type: string
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [oldest_first, newest_first, lowest_confidence_first]
+      responses:
+        "200":
+          description: Filtered manual review queue
+        "403":
+          description: Insufficient RBAC role permissions
+
+  /api/v1/reviews/taxonomy:
+    get:
+      summary: Retrieve active approved taxonomy classes for controlled relabelling (Reviewer or Admin role required)
+      responses:
+        "200":
+          description: Active approved taxonomy classes
+
+  /api/v1/reviews/export/dataset-feedback:
+    get:
+      summary: Export explicitly approved reviewed records for separate Colab dataset retraining (Reviewer or Admin role required)
+      responses:
+        "200":
+          description: Approved dataset feedback manifest preserving original and reviewer labels separately
+
+  /api/v1/reviews/{classification_id}:
+    get:
+      summary: Retrieve full review detail including evidence signed URL and append-only audit history (Reviewer or Admin role required)
+      parameters:
+        - name: classification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Detailed review record and audit history
+        "404":
+          description: Review record not found
+    post:
+      summary: Save a controlled manual review decision with optimistic concurrency & taxonomy validation (Reviewer or Admin role required)
+      parameters:
+        - name: classification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [confirmed, relabelled, unresolved]
+                resolved_class:
+                  type: [string, "null"]
+                reviewer_notes:
+                  type: string
+                expected_version:
+                  type: [integer, "null"]
+                approved_for_dataset_export:
+                  type: boolean
+      responses:
+        "200":
+          description: Updated manual review record and audit history
+        "403":
+          description: Insufficient RBAC role permissions
+        "409":
+          description: Concurrent review submission conflict
+        "422":
+          description: Taxonomy or validation error
+
+  /api/v1/reviews/{classification_id}/claim:
+    post:
+      summary: Claim a pending review as in_progress for the current reviewer (Reviewer or Admin role required)
+      parameters:
+        - name: classification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Claimed review record
+        "409":
+          description: Review already claimed or resolved
+
+  /api/v1/analytics/summary:
+    get:
+      summary: Retrieve verified dashboard aggregates from persisted PostgreSQL records
+      responses:
+        "200":
+          description: Verified aggregate counts
+
+  /api/v1/analytics/dashboard:
+    get:
+      summary: Server-side monitoring dashboard aggregations with date/category/decision/model/review filters and operational alerts
+      parameters:
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: decision_status
+          in: query
+          schema:
+            type: string
+            enum: [accepted, review_required, mapping_unconfigured, rejected]
+        - name: model_version
+          in: query
+          schema:
+            type: string
+        - name: review_status
+          in: query
+          schema:
+            type: string
+            enum: [not_required, pending, in_progress, confirmed, relabelled, unresolved]
+      responses:
+        "200":
+          description: Server-side aggregated monitoring dashboard metrics, time-series, distributions, and alerts
+
+  /api/v1/analytics/alerts/config:
+    get:
+      summary: Read administrator-configured operational alert thresholds
+      responses:
+        "200":
+          description: Operational alert thresholds
+    put:
+      summary: Update operational alert thresholds (Admin role required)
+      responses:
+        "200":
+          description: Updated operational alert thresholds
+        "403":
+          description: Insufficient RBAC role permissions
+
+  /api/v1/analytics/export:
+    get:
+      summary: Export valid CSV monitoring reports (classification_history, analytics_summary, model_usage, manual_review, category_distribution)
+      parameters:
+        - name: report_type
+          in: query
+          schema:
+            type: string
+            enum: [classification_history, analytics_summary, model_usage, manual_review, category_distribution]
+      responses:
+        "200":
+          description: RFC-4180 CSV attachment

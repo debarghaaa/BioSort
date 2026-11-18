@@ -1,0 +1,216 @@
+import { Link } from 'react-router-dom';
+import { LegalPageLayout, LegalSection, type LegalSectionMeta } from '../components/legal/LegalPageLayout';
+import { SITE_CONFIG } from '../config/siteConfig';
+
+const TERMS_SECTIONS: LegalSectionMeta[] = [
+  { id: 'acceptance', title: 'Acceptance of Terms' },
+  { id: 'platform-description', title: 'Platform Description and Software Scope' },
+  { id: 'eligibility-roles', title: 'Eligibility and Role-Scoped Access' },
+  { id: 'account-security', title: 'Account Security and Credentials' },
+  { id: 'acceptable-use', title: 'Acceptable Use and Prohibited Uploads' },
+  { id: 'ai-disclaimer', title: 'AI Segmentation & Classification Disclaimer' },
+  { id: 'no-certification', title: 'No Regulatory Certification or Safety Substitution' },
+  { id: 'uploaded-content-ip', title: 'Uploaded Images and Intellectual Property' },
+  { id: 'dataset-export', title: 'Dataset Feedback Export Separation' },
+  { id: 'availability-dependencies', title: 'Service Availability and Configuration Dependencies' },
+  { id: 'prohibited-abuse', title: 'Prohibited Reverse Engineering and Rate Limits' },
+  { id: 'warranty-disclaimer', title: 'Disclaimer of Warranties' },
+  { id: 'limitation-liability', title: 'Limitation of Liability' },
+  { id: 'indemnification', title: 'Indemnification' },
+  { id: 'termination', title: 'Suspension and Termination' },
+  { id: 'governing-law', title: 'Governing Law and Dispute Resolution' },
+  { id: 'contact-updates', title: 'Contact Information and Updates' },
+];
+
+export function TermsPage() {
+  return (
+    <LegalPageLayout
+      eyebrow="Terms of Use"
+      title="Terms and Conditions"
+      summary="Terms governing use of the BioSort biomedical waste image segmentation platform, clarifying assistive software boundaries, mandatory human review, and unverified deployment dependencies."
+      sections={TERMS_SECTIONS}
+    >
+      <LegalSection id="acceptance" number="01" title="Acceptance of Terms">
+        <p>
+          By accessing public pages or signing in to the <strong>{SITE_CONFIG.platformName}</strong>{' '}
+          workspace, you agree to comply with these Terms and Conditions and any organizational
+          operating procedures established by the entity deploying this instance.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="platform-description" number="02" title="Platform Description and Software Scope">
+        <p>
+          {SITE_CONFIG.platformName} is a software-only AI-assisted visual analysis, classification,
+          audit logging, and human review platform for biomedical waste imagery. It has{' '}
+          <strong className="text-[#171717]">no physical hardware integration</strong> and does not
+          actuate mechanical bins, locks, scales, incinerators, or disposal equipment.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="eligibility-roles" number="03" title="Eligibility and Role-Scoped Access">
+        <p>
+          Workspace capabilities are scoped by assigned role (<code className="font-mono text-[#171717]">operator</code>,{' '}
+          <code className="font-mono text-[#171717]">reviewer</code>, or{' '}
+          <code className="font-mono text-[#171717]">admin</code>). Where Supabase Authentication is
+          unconfigured in preview builds, local Foundation or Guest Mode sessions are strictly for
+          workflow inspection and carry no production authentication guarantees.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="account-security" number="04" title="Account Security and Credentials">
+        <p>
+          When authenticated via Supabase Auth, you are responsible for safeguarding your login
+          credentials and signing out cleanly on shared facility workstations. Notify the
+          deployment administrator immediately of any unauthorized session activity.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="acceptable-use" number="05" title="Acceptable Use and Prohibited Uploads">
+        <p>You agree NOT to use BioSort to:</p>
+        <ul className="list-disc pl-5 space-y-1.5">
+          <li>
+            Upload identifiable patient photographs, medical charts, prescription labels, or
+            Protected Health Information (PHI).
+          </li>
+          <li>
+            Upload corrupted files, non-JPEG/PNG masqueraded payloads, automated spam, or malware.
+          </li>
+          <li>
+            Attempt to bypass Row-Level Security, RBAC route guards, upload size caps, or API rate
+            limits.
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection id="ai-disclaimer" number="06" title="AI Segmentation & Classification Disclaimer">
+        <div className="oi-tile space-y-2 text-xs">
+          <p className="oi-subpanel-title">Assistive Decision-Support Only</p>
+          <p className="leading-relaxed">
+            Model predictions, confidence scores, and bin recommendations generated by BioSort are
+            probabilistic estimates produced from visual input. Predictions may be inaccurate due to
+            occlusion, lighting, container similarity, or out-of-distribution waste items.{' '}
+            <strong className="text-[#171717]">
+              Mandatory human inspection and verification remain the sole responsibility of trained
+              personnel before physical waste segregation or disposal.
+            </strong>
+          </p>
+        </div>
+      </LegalSection>
+
+      <LegalSection id="no-certification" number="07" title="No Regulatory Certification or Safety Substitution">
+        <p>
+          BioSort is not certified as medical device software, diagnostic instrumentation, or a
+          regulatory compliance certifier. Output logs do not replace statutory reporting, manifests,
+          or facility compliance obligations under India&apos;s{' '}
+          <strong className="text-[#171717]">Bio-Medical Waste Management Rules, 2016</strong> (as
+          amended), Central/State Pollution Control Board (CPCB/SPCB) guidelines, or institutional
+          biosafety protocols.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="uploaded-content-ip" number="08" title="Uploaded Images and Intellectual Property">
+        <p>
+          You or your deploying organization retain all rights to uploaded images. By submitting
+          images, you confirm you hold permission to process them through the configured inference
+          and private evidence storage services. Software source code, UI components, and model
+          weights remain subject to their respective repository and operator licenses.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="dataset-export" number="09" title="Dataset Feedback Export Separation">
+        <p>
+          Submitted images are not used for live model retraining. Only reviewed records explicitly
+          marked <code className="font-mono text-[#171717]">approved_for_dataset_export = true</code>{' '}
+          by authorized <code className="font-mono text-[#171717]">reviewer</code> or{' '}
+          <code className="font-mono text-[#171717]">admin</code> users become eligible for offline
+          dataset feedback export.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="availability-dependencies" number="10" title="Service Availability and Configuration Dependencies">
+        <p>
+          Full operational capability requires properly deployed Supabase Auth/Postgres/Storage and
+          FastAPI ONNX Runtime inference services. Unconfigured or offline backends will block live
+          inference or persistence rather than fabricating classification results.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="prohibited-abuse" number="11" title="Prohibited Reverse Engineering and Rate Limits">
+        <p>
+          Automated scraping, load flooding, attempting to extract private{' '}
+          <code className="font-mono text-[#171717]">service_role</code> credentials, or bypassing
+          API rate-limiting middleware is prohibited.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="warranty-disclaimer" number="12" title="Disclaimer of Warranties">
+        <p>
+          To the fullest extent permitted by applicable law, the BioSort software is provided on an
+          &ldquo;AS IS&rdquo; and &ldquo;AS AVAILABLE&rdquo; basis without warranties of fitness for a
+          particular clinical, environmental, or regulatory purpose, uninterrupted availability, or
+          error-free classification accuracy. Nothing in these Terms excludes warranties that cannot
+          be lawfully disclaimed under applicable statutory law.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="limitation-liability" number="13" title="Limitation of Liability">
+        <p>
+          Subject always to liabilities that cannot lawfully be excluded or limited (such as liability
+          for willful misconduct, gross negligence, fraud, or non-excludable statutory obligations),
+          neither the software authors nor the deploying operator shall be liable for indirect,
+          consequential, or operational losses arising from reliance on unverified AI predictions,
+          improper physical waste handling, or failure to verify flagged classifications.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="indemnification" number="14" title="Indemnification">
+        <p>
+          To the extent permitted by applicable law, organizations and users agree to remain
+          responsible for claims resulting from their own unlawful uploads (including unauthorized
+          inclusion of patient identifiers), breach of physical biosafety regulations, or misuse of
+          the platform contrary to these Terms.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="termination" number="15" title="Suspension and Termination">
+        <p>
+          Administrators may revoke user roles or suspend workspace access for misuse or security
+          policy violations. Because database audit triggers forbid modification or deletion of{' '}
+          <code className="font-mono text-[#171717]">audit_events</code>, historical audit records
+          persist according to database governance rules.
+        </p>
+      </LegalSection>
+
+      <LegalSection id="governing-law" number="16" title="Governing Law and Dispute Resolution">
+        <p>
+          <strong className="text-[#171717]">Governing Jurisdiction:</strong>{' '}
+          {SITE_CONFIG.governingJurisdiction ?? (
+            <span className="text-[#737373]">
+              [Unconfigured — Pending Verified Legal Entity &amp; Qualified Indian Legal Counsel
+              Review (set VITE_GOVERNING_JURISDICTION)]
+            </span>
+          )}
+        </p>
+      </LegalSection>
+
+      <LegalSection id="contact-updates" number="17" title="Contact Information and Updates">
+        <p>
+          Questions regarding these Terms or requests for organizational licensing terms may be
+          directed through the{' '}
+          <Link to="/contact" className="text-[#4338CA] hover:underline">
+            Contact page
+          </Link>{' '}
+          and read together with our{' '}
+          <Link to="/privacy-policy" className="text-[#4338CA] hover:underline">
+            Privacy Policy
+          </Link>{' '}
+          and{' '}
+          <Link to="/cookie-policy" className="text-[#4338CA] hover:underline">
+            Cookie Policy
+          </Link>
+          .
+        </p>
+      </LegalSection>
+    </LegalPageLayout>
+  );
+}

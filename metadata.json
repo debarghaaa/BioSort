@@ -1,0 +1,6 @@
+{
+  "name": "AI Medical Waste Segregation Platform",
+  "description": "Software-only assistive medical waste image classification, confidence verification, configurable category-to-bin decision policy, manual review, and audit recordkeeping platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BioSort — Biomedical Waste Segregation Platform</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23171717' stroke-width='1.85' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='2.5' width='19' height='19' rx='5' fill='%23ffffff'/%3E%3Cpath d='M9 6.25V10.75M6.75 8.5H11.25'/%3E%3Cpath d='M14.5 7.5H17.75M17.75 7.5L16.25 6M17.75 7.5L16.25 9'/%3E%3Cpath d='M6.75 15.75H17.25M17.25 15.75L15.25 13.75M17.25 15.75L15.25 17.75'/%3E%3C/svg%3E"
+    />
+    <meta
+      name="description"
+      content="BioSort clinical biomedical waste image classification, confidence verification, configurable segregation policy engine, manual review, and audit recordkeeping platform."
+    />
+    <meta property="og:title" content="BioSort — Biomedical Waste Segregation Platform" />
+    <meta
+      property="og:description"
+      content="BioSort assistive biomedical waste image classification, confidence verification, manual review workflow, and audit monitoring."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .oi-boot-shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background-color: #FCFBF9;
+        color: #171717;
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      .oi-boot-card {
+        width: 100%;
+        max-width: 420px;
+        background: #FFFFFF;
+        border: 1px solid #E5E5E5;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 12px 36px -16px rgba(23, 23, 23, 0.08);
+      }
+      .oi-boot-bar-track {
+        height: 2px;
+        width: 100%;
+        background-color: #E5E5E5;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .oi-boot-bar-sweep {
+        height: 100%;
+        width: 42%;
+        background-color: #4338CA;
+        border-radius: 999px;
+        animation: oiBootSweep 1.35s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+      }
+      @keyframes oiBootSweep {
+        0% { transform: translateX(-110%); }
+        100% { transform: translateX(260%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .oi-boot-bar-sweep {
+          animation: none;
+          width: 60%;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-[#FCFBF9] text-[#171717] antialiased selection:bg-[#4338CA] selection:text-[#FFFFFF]">
+    <div id="root">
+      <div class="oi-boot-shell" role="status" aria-live="polite" aria-label="Loading BioSort">
+        <div class="oi-boot-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+            <div style="height:40px;width:40px;border-radius:12px;background:rgba(67,56,202,0.08);border:1px solid rgba(67,56,202,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4338CA" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2.5" y="2.5" width="19" height="19" rx="5" />
+                <path d="M9 6.25V10.75M6.75 8.5H11.25" />
+                <path d="M14.5 7.5H17.75M17.75 7.5L16.25 6M17.75 7.5L16.25 9" />
+                <path d="M6.75 15.75H17.25M17.25 15.75L15.25 13.75M17.25 15.75L15.25 17.75" />
+              </svg>
+            </div>
+            <div>
+              <div style="font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:600;line-height:1.2;color:#171717;">BioSort</div>
+              <div style="font-size:12px;color:#737373;margin-top:2px;">Biomedical Waste Segregation</div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:#525252;margin-bottom:14px;">Initializing workspace...</div>
+          <div class="oi-boot-bar-track"><div class="oi-boot-bar-sweep"></div></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

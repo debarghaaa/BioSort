@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://medical-waste-platform.local/contracts/classification.schema.json",
+  "title": "SharedClassificationResult",
+  "description": "Canonical API contract shared across React frontend, FastAPI ONNX inference backend, and Supabase persistence layer.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "classification_id",
+    "predicted_class",
+    "candidate_predictions",
+    "model_version",
+    "decision_status",
+    "recommended_bin",
+    "requires_manual_review",
+    "review_reason",
+    "created_at"
+  ],
+  "properties": {
+    "classification_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique UUID identifying this classification event."
+    },
+    "predicted_class": {
+      "type": ["string", "null"],
+      "description": "Top predicted taxonomy class name, or null if rejected or unresolved."
+    },
+    "candidate_predictions": {
+      "type": "array",
+      "description": "Ordered candidate predictions from the ONNX model. Scores are model outputs, not classification accuracy.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class_name", "model_score", "calibrated_confidence"],
+        "properties": {
+          "class_name": {
+            "type": "string"
+          },
+          "model_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "calibrated_confidence": {
+            "type": ["number", "null"],
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "model_version": {
+      "type": "string",
+      "description": "Explicit identifier of the ONNX model artifact and preprocessing configuration."
+    },
+    "decision_status": {
+      "type": "string",
+      "enum": ["accepted", "review_required", "mapping_unconfigured", "rejected"],
+      "description": "Outcome from the deterministic policy and category-to-bin decision engine."
+    },
+    "recommended_bin": {
+      "type": ["string", "null"],
+      "description": "Configured segregation bin identifier only when decision_status is accepted and mapping is verified; otherwise null."
+    },
+    "requires_manual_review": {
+      "type": "boolean",
+      "description": "True whenever confidence is below threshold, mapping is unverified/missing, or input requires operator verification."
+    },
+    "review_reason": {
+      "type": ["string", "null"],
+      "description": "Explicit rationale when manual review is required or input was rejected."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp of classification event creation."
+    }
+  }
+}
